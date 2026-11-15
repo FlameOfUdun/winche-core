@@ -23,7 +23,7 @@ public class WincheAppSetupTests
         Assert.Contains("// apple: one of a, b", dart);
         // Without an app, it says how to get one; with no platforms named, all of them.
         var plain = (Setup with { App = null }).DartOptionsFile();
-        Assert.Contains("No app id: register the app in the console", plain);
+        Assert.Contains("No app id: register the app (`winche apps:create <name>`", plain);
         Assert.Equal(WincheAppSetup.AllPlatforms.Count, WincheAppSetup.AllPlatforms.Count(p => plain.Contains($"static final {p} = ")));
     }
 

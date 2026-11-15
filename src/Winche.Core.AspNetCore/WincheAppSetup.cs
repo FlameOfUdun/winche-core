@@ -40,7 +40,7 @@ public sealed record WincheAppSetup(string ProjectId, string? Name, string BaseU
         var b = new StringBuilder();
         b.Append("// Written by `winche configure` from ").Append(BaseUrl).Append(".\n");
         b.Append("// Run it again after adding a platform or a sign-in provider.\n");
-        if (App is null) b.Append("// No app id: register the app in the console, then `winche configure --app <its id>`.\n");
+        if (App is null) b.Append("// No app id: register the app (`winche apps:create <name>`, or in the console), then `winche configure --app <its id>`.\n");
         b.Append("//\n// ignore_for_file: type=lint\n");
         b.Append("import 'package:winche_flutter/winche_flutter.dart';\n\n");
         b.Append("/// Winche options for each platform this app runs on, for project `").Append(ProjectId).Append("`.\n");

@@ -6,7 +6,7 @@ namespace Winche;
 
 /// <summary>
 /// What kind of failure an error is, the same in every Winche API and SDK. On the wire it is the kebab-case name
-/// (<c>not-found</c>, <c>permission-denied</c>, …), the codes Firebase uses.
+/// (<c>not-found</c>, <c>permission-denied</c>, …).
 /// </summary>
 public enum WincheErrorCode
 {
