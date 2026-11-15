@@ -1,0 +1,142 @@
+using System.Text.Json.Serialization;
+
+namespace Winche.Values;
+
+[JsonConverter(typeof(ValueJsonConverter))]
+public abstract record Value
+{
+    /// <summary>
+    /// The value for a plain .NET object: null, bool, integers, floating point, string, bytes, DateTimeOffset/DateTime,
+    /// dictionaries (as maps) and other sequences (as arrays); anything else as its text. For claims, JSON and the like.
+    /// </summary>
+    public static Value FromObject(object? value) => value switch
+    {
+        null => new NullValue(),
+        Value v => v,
+        System.Text.Json.Nodes.JsonNode n => PlainJson.ToValue(n),
+        System.Text.Json.JsonElement e => PlainJson.ToValue(System.Text.Json.Nodes.JsonNode.Parse(e.GetRawText())),
+        bool b => new BooleanValue(b),
+        long l => new IntegerValue(l),
+        int i => new IntegerValue(i),
+        short h => new IntegerValue(h),
+        double d => new DoubleValue(d),
+        float f => new DoubleValue(f),
+        decimal m => new DoubleValue((double)m),
+        string s => new StringValue(s),
+        byte[] bytes => new BytesValue(bytes),
+        DateTimeOffset dto => new TimestampValue(dto),
+        DateTime dt => new TimestampValue(new DateTimeOffset(dt.Kind == DateTimeKind.Unspecified ? DateTime.SpecifyKind(dt, DateTimeKind.Utc) : dt)),
+        IReadOnlyDictionary<string, object?> map => new MapValue(map.ToDictionary(kv => kv.Key, kv => FromObject(kv.Value))),
+        IDictionary<string, object?> map => new MapValue(map.ToDictionary(kv => kv.Key, kv => FromObject(kv.Value))),
+        System.Collections.IEnumerable list => new ArrayValue([.. list.Cast<object?>().Select(FromObject)]),
+        _ => new StringValue(value.ToString() ?? string.Empty),
+    };
+
+    public abstract TypeRank Rank { get; }
+}
+
+public sealed record NullValue : Value
+{
+    public override TypeRank Rank => TypeRank.Null;
+}
+
+public sealed record BooleanValue(bool Value) : Value
+{
+    public override TypeRank Rank => TypeRank.Boolean;
+}
+
+public sealed record IntegerValue(long Value) : Value
+{
+    public override TypeRank Rank => TypeRank.Number;
+}
+
+public sealed record DoubleValue(double Value) : Value
+{
+    public override TypeRank Rank => double.IsNaN(Value) ? TypeRank.NaN : TypeRank.Number;
+}
+
+public sealed record TimestampValue : Value
+{
+    public DateTimeOffset Value { get; }
+
+    public TimestampValue(DateTimeOffset value) =>
+        Value = new DateTimeOffset(value.Ticks - value.Ticks % 10, value.Offset); // truncate to µs (1 tick = 100ns)
+
+    public override TypeRank Rank => TypeRank.Timestamp;
+}
+
+public sealed record StringValue(string Value) : Value
+{
+    public override TypeRank Rank => TypeRank.String;
+}
+
+public sealed record BytesValue(byte[] Value) : Value
+{
+    public override TypeRank Rank => TypeRank.Bytes;
+
+    public bool Equals(BytesValue? other) =>
+        other is not null && Value.AsSpan().SequenceEqual(other.Value);
+
+    public override int GetHashCode()
+    {
+        var hash = new HashCode();
+        hash.AddBytes(Value);
+        return hash.ToHashCode();
+    }
+}
+
+/// <summary>A reference to a document (<c>docRefValue</c>).</summary>
+public sealed record ReferenceValue(string Path) : Value
+{
+    public override TypeRank Rank => TypeRank.Reference;
+}
+
+/// <summary>A reference to a file in Winche Storage, by its path (<c>fileRefValue</c>).</summary>
+public sealed record FileRefValue(string Path) : Value
+{
+    public override TypeRank Rank => TypeRank.FileRef;
+}
+
+/// <summary>A reference to a Winche Auth user, by uid (<c>userRefValue</c>).</summary>
+public sealed record UserRefValue(string Uid) : Value
+{
+    public override TypeRank Rank => TypeRank.UserRef;
+}
+
+public sealed record GeoPointValue(double Latitude, double Longitude) : Value
+{
+    public override TypeRank Rank => TypeRank.GeoPoint;
+}
+
+public sealed record ArrayValue(IReadOnlyList<Value> Values) : Value
+{
+    public override TypeRank Rank => TypeRank.Array;
+
+    public bool Equals(ArrayValue? other) =>
+        other is not null && Values.SequenceEqual(other.Values);
+
+    public override int GetHashCode()
+    {
+        var hash = new HashCode();
+        foreach (var v in Values) hash.Add(v);
+        return hash.ToHashCode();
+    }
+}
+
+public sealed record MapValue(IReadOnlyDictionary<string, Value> Fields) : Value
+{
+    public override TypeRank Rank => TypeRank.Map;
+
+    public bool Equals(MapValue? other) =>
+        other is not null
+        && Fields.Count == other.Fields.Count
+        && Fields.All(kv => other.Fields.TryGetValue(kv.Key, out var v) && kv.Value.Equals(v));
+
+    public override int GetHashCode()
+    {
+        // order-independent: XOR of per-entry hashes
+        var hash = 0;
+        foreach (var (k, v) in Fields) hash ^= HashCode.Combine(k, v);
+        return hash;
+    }
+}

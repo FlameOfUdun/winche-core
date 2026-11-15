@@ -1,0 +1,27 @@
+<Project>
+  <PropertyGroup>
+    <Version>1.0.0</Version>
+    <Authors>Ehsan Rashidi</Authors>
+    <Copyright>Copyright © 2026 Ehsan Rashidi</Copyright>
+    <PackageProjectUrl>https://github.com/FlameOfUdun/winche-core</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/FlameOfUdun/winche-core</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageDescription>What every Winche package shares: the error every Winche API answers with (WincheError, WincheErrorCode), and settings the console can change — versioned areas with history, restore and reset, applied live on every instance, and encrypted secrets — in the project's PostgreSQL database.</PackageDescription>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <IsPackable>true</IsPackable>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="\" />
+    <None Include="$(MSBuildThisFileDirectory)LICENSE" Pack="true" PackagePath="\" />
+  </ItemGroup>
+</Project>
