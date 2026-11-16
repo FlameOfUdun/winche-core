@@ -209,6 +209,10 @@ public class SettingsTests(PostgresFixture pg)
             await secrets.SetAsync("smtp.password", "another", "admin@x");
             Assert.Equal("s3cr3t-value", await secrets.GetAsync("keycloak.clientSecret"));
             Assert.Equal("admin@x", (await secrets.InfoAsync("keycloak.clientSecret"))?.SetBy);
+            await secrets.SetAsync("functions.secret.B", "b", null);
+            await secrets.SetAsync("functions.secret.A", "a", "admin@x");
+            Assert.Equal(["functions.secret.A", "functions.secret.B"], (await secrets.ListAsync("functions.secret.")).Select(i => i.Name));
+            Assert.Empty(await secrets.ListAsync("nothing."));
             Assert.Null(await secrets.GetAsync("nope"));
 
             await using var conn = new NpgsqlConnection(db);

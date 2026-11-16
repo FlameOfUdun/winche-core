@@ -108,6 +108,18 @@ public sealed class SecretStore
         return new SecretKeyStatus(moved, current, unreadable);
     }
 
+    /// <summary>The secrets whose names start with <paramref name="prefix"/> (when and by whom each was set, never values), by name.</summary>
+    public async Task<IReadOnlyList<SecretInfo>> ListAsync(string prefix, CancellationToken ct = default)
+    {
+        await using var cmd = _db.CreateCommand("SELECT name, set_at, set_by FROM winche_secrets WHERE starts_with(name, @prefix) ORDER BY name COLLATE \"C\"");
+        cmd.Parameters.AddWithValue("prefix", prefix);
+        var list = new List<SecretInfo>();
+        await using var reader = await cmd.ExecuteReaderAsync(ct);
+        while (await reader.ReadAsync(ct))
+            list.Add(new SecretInfo(reader.GetString(0), new DateTimeOffset(reader.GetDateTime(1), TimeSpan.Zero), reader.IsDBNull(2) ? null : reader.GetString(2)));
+        return list;
+    }
+
     public async Task<SecretInfo?> InfoAsync(string name, CancellationToken ct = default)
     {
         await using var cmd = _db.CreateCommand("SELECT set_at, set_by FROM winche_secrets WHERE name = @name");
