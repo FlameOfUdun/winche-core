@@ -3,6 +3,16 @@
 What every Winche package shares: **settings** the console (or the CLI, or your own tools) can change while the app
 runs, **secrets**, the **error** every Winche API answers with, and the **values** documents hold.
 
+## Install
+
+```sh
+dotnet add package Winche.Core
+dotnet add package Winche.Core.AspNetCore   # for ASP.NET Core: errors as HTTP answers, the caller, the app setup endpoint
+```
+
+Every Winche package depends on Winche.Core, so an app using them already has it: add it yourself only to use it
+directly.
+
 ## Value types
 
 Each type has one name, written out in full, and every place derives from it: the wire key (`<name>Value`), the class
