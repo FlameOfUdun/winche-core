@@ -85,22 +85,22 @@ public sealed record BytesValue(byte[] Value) : Value
     }
 }
 
-/// <summary>A reference to a document (<c>docRefValue</c>).</summary>
-public sealed record ReferenceValue(string Path) : Value
+/// <summary>A reference to a document (<c>documentReferenceValue</c>).</summary>
+public sealed record DocumentReferenceValue(string Path) : Value
 {
-    public override TypeRank Rank => TypeRank.Reference;
+    public override TypeRank Rank => TypeRank.DocumentReference;
 }
 
-/// <summary>A reference to a file in Winche Storage, by its path (<c>fileRefValue</c>).</summary>
-public sealed record FileRefValue(string Path) : Value
+/// <summary>A reference to a file in Winche Storage, by its path (<c>fileReferenceValue</c>).</summary>
+public sealed record FileReferenceValue(string Path) : Value
 {
-    public override TypeRank Rank => TypeRank.FileRef;
+    public override TypeRank Rank => TypeRank.FileReference;
 }
 
-/// <summary>A reference to a Winche Auth user, by uid (<c>userRefValue</c>).</summary>
-public sealed record UserRefValue(string Uid) : Value
+/// <summary>A reference to a Winche Auth user, by uid (<c>userReferenceValue</c>).</summary>
+public sealed record UserReferenceValue(string Uid) : Value
 {
-    public override TypeRank Rank => TypeRank.UserRef;
+    public override TypeRank Rank => TypeRank.UserReference;
 }
 
 public sealed record GeoPointValue(double Latitude, double Longitude) : Value

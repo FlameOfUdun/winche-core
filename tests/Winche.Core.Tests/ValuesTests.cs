@@ -28,7 +28,7 @@ public class ValuesTests
     {
         var doc = new MapValue(new Dictionary<string, Value>
         {
-            ["where"] = new GeoPointValue(51.5, -0.1), ["ref"] = new ReferenceValue("users/u1"), ["n"] = new IntegerValue(7),
+            ["where"] = new GeoPointValue(51.5, -0.1), ["ref"] = new DocumentReferenceValue("users/u1"), ["n"] = new IntegerValue(7),
         });
         Assert.Equal("""{"where":{"latitude":51.5,"longitude":-0.1},"ref":"users/u1","n":7}""", PlainJson.Of(doc)!.ToJsonString());
         var wire = JsonSerializer.Serialize<Value>(doc);
@@ -66,13 +66,13 @@ public class ValuesTests
     [Fact]
     public void Document_file_and_user_references_have_their_own_tags()
     {
-        Assert.Equal("""{"docRefValue":"patients/p1"}""", ValueSerializer.Write(new ReferenceValue("patients/p1")).ToJsonString());
-        Assert.Equal("""{"fileRefValue":"scans/a.png"}""", ValueSerializer.Write(new FileRefValue("scans/a.png")).ToJsonString());
-        Assert.Equal("""{"userRefValue":"u1"}""", ValueSerializer.Write(new UserRefValue("u1")).ToJsonString());
-        Assert.Equal(new FileRefValue("a"), ValueSerializer.Read(System.Text.Json.Nodes.JsonNode.Parse("""{"fileRefValue":"a"}""")!));
+        Assert.Equal("""{"documentReferenceValue":"patients/p1"}""", ValueSerializer.Write(new DocumentReferenceValue("patients/p1")).ToJsonString());
+        Assert.Equal("""{"fileReferenceValue":"scans/a.png"}""", ValueSerializer.Write(new FileReferenceValue("scans/a.png")).ToJsonString());
+        Assert.Equal("""{"userReferenceValue":"u1"}""", ValueSerializer.Write(new UserReferenceValue("u1")).ToJsonString());
+        Assert.Equal(new FileReferenceValue("a"), ValueSerializer.Read(System.Text.Json.Nodes.JsonNode.Parse("""{"fileReferenceValue":"a"}""")!));
         // Ordered by type, then value: documents, then files, then users (between bytes and geo points).
-        Assert.True(ValueComparer.Instance.Compare(new ReferenceValue("z"), new FileRefValue("a")) < 0);
-        Assert.True(ValueComparer.Instance.Compare(new FileRefValue("z"), new UserRefValue("a")) < 0);
-        Assert.True(ValueComparer.Instance.Compare(new UserRefValue("z"), new GeoPointValue(0, 0)) < 0);
+        Assert.True(ValueComparer.Instance.Compare(new DocumentReferenceValue("z"), new FileReferenceValue("a")) < 0);
+        Assert.True(ValueComparer.Instance.Compare(new FileReferenceValue("z"), new UserReferenceValue("a")) < 0);
+        Assert.True(ValueComparer.Instance.Compare(new UserReferenceValue("z"), new GeoPointValue(0, 0)) < 0);
     }
 }

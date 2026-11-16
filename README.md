@@ -1,7 +1,32 @@
 # Winche.Core
 
 What every Winche package shares: **settings** the console (or the CLI, or your own tools) can change while the app
-runs, **secrets**, and the **error** every Winche API answers with.
+runs, **secrets**, the **error** every Winche API answers with, and the **values** documents hold.
+
+## Value types
+
+Each type has one name, written out in full, and every place derives from it: the wire key (`<name>Value`), the class
+in C# and Dart (`<Name>Value`), the type in rules (`x is <name>`) and the console's label.
+
+| Name | Wire | Class | Holds |
+|---|---|---|---|
+| `null` | `{"nullValue": null}` | `NullValue` | nothing |
+| `boolean` | `{"booleanValue": true}` | `BooleanValue` | true or false |
+| `integer` | `{"integerValue": "42"}` | `IntegerValue` | a 64-bit whole number (a string on the wire, so no digits are lost) |
+| `double` | `{"doubleValue": 4.5}` | `DoubleValue` | a 64-bit floating-point number |
+| `timestamp` | `{"timestampValue": "2026-11-15T10:00:00Z"}` | `TimestampValue` | a moment, to the microsecond |
+| `string` | `{"stringValue": "Ann"}` | `StringValue` | text |
+| `bytes` | `{"bytesValue": "AQID"}` | `BytesValue` | binary data (base64) |
+| `documentReference` | `{"documentReferenceValue": "users/u1"}` | `DocumentReferenceValue` | a document, by its path |
+| `fileReference` | `{"fileReferenceValue": "scans/a.png"}` | `FileReferenceValue` | a file in Winche Storage, by its path |
+| `userReference` | `{"userReferenceValue": "u1"}` | `UserReferenceValue` | a Winche Auth user, by uid |
+| `geoPoint` | `{"geoPointValue": {"latitude": 51.5, "longitude": -0.12}}` | `GeoPointValue` | a place |
+| `array` | `{"arrayValue": {"values": [ … ]}}` | `ArrayValue` | an ordered list of values |
+| `map` | `{"mapValue": {"fields": { … }}}` | `MapValue` | named values |
+
+Rules also have `number` (an `integer` or a `double`). A path built in a rule, such as `/users/$(id)` or
+`path('users', id)`, is a `documentReference`.
+Values of different types sort in the order of the table (numbers together), the same in queries, indexes and rules.
 
 ## Errors
 

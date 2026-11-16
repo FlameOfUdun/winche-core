@@ -13,7 +13,7 @@ public sealed record ReferenceCaller(IReadOnlyDictionary<string, object?>? Claim
 }
 
 /// <summary>
-/// Turns a file or user reference a document holds (<c>fileRefValue</c>, <c>userRefValue</c>) into what it stands
+/// Turns a file or user reference a document holds (<c>fileReferenceValue</c>, <c>userReferenceValue</c>) into what it stands
 /// for, so the database's <c>expand</c> can return it: <c>expand: ["scan", "author"]</c>. Winche.Storage registers
 /// <c>file</c> and Winche Auth <c>user</c>. Registered in DI, one per <see cref="Kind"/>.
 /// </summary>

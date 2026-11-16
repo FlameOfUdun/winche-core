@@ -14,9 +14,9 @@ public enum TypeRank : short
     Timestamp = 40,
     String = 50,
     Bytes = 60,
-    Reference = 70,  // a document (docRefValue)
-    FileRef = 72,    // a file in Winche Storage (fileRefValue)
-    UserRef = 74,    // a Winche Auth user (userRefValue)
+    DocumentReference = 70,  // a document (documentReferenceValue)
+    FileReference = 72,      // a file in Winche Storage (fileReferenceValue)
+    UserReference = 74,      // a Winche Auth user (userReferenceValue)
     GeoPoint = 80,
     Array = 90,
     Map = 100,

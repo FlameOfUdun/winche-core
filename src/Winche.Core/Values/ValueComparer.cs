@@ -33,9 +33,9 @@ public sealed class ValueComparer : IComparer<Value>
             (TimestampValue a, TimestampValue b) => a.Value.UtcTicks.CompareTo(b.Value.UtcTicks),
             (StringValue a, StringValue b) => CompareCodePoints(a.Value, b.Value),
             (BytesValue a, BytesValue b) => a.Value.AsSpan().SequenceCompareTo(b.Value),
-            (ReferenceValue a, ReferenceValue b) => CompareCodePoints(a.Path, b.Path),
-            (FileRefValue a, FileRefValue b) => CompareCodePoints(a.Path, b.Path),
-            (UserRefValue a, UserRefValue b) => CompareCodePoints(a.Uid, b.Uid),
+            (DocumentReferenceValue a, DocumentReferenceValue b) => CompareCodePoints(a.Path, b.Path),
+            (FileReferenceValue a, FileReferenceValue b) => CompareCodePoints(a.Path, b.Path),
+            (UserReferenceValue a, UserReferenceValue b) => CompareCodePoints(a.Uid, b.Uid),
             (GeoPointValue a, GeoPointValue b) => a.Latitude != b.Latitude
                 ? a.Latitude.CompareTo(b.Latitude)
                 : a.Longitude.CompareTo(b.Longitude),
