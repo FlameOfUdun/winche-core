@@ -1,7 +1,8 @@
 # Winche.Core
 
 What every Winche package shares: **settings** the console (or the CLI, or your own tools) can change while the app
-runs, **secrets**, the **error** every Winche API answers with, and the **values** documents hold.
+runs, the **master key** signing keys derive from, the **error** every Winche API answers with, and the **values**
+documents hold. (Secrets are Winche.Secrets', kept with the master key in the same database.)
 
 ## Install
 
@@ -54,8 +55,7 @@ return Results.Json(error.ToBody(), statusCode: error.HttpStatus);
 
 The app's code gives each group of settings — an **area** — its starting values. A version saved in the store replaces
 them on every instance within seconds, keeps a complete history (who, when, why), can be restored, and can be reset to
-the code's values. Secrets (client secrets, storage keys, mail passwords) are kept encrypted with the project's master
-key and are never shown again. Everything lives in the project's own PostgreSQL database, so a self-hosted project
+the code's values. Everything lives in the project's own PostgreSQL database, so a self-hosted project
 carries its settings with it.
 
 Each Winche package works without this one: without `AddWincheConfig`, its areas simply use the code's values.
@@ -64,7 +64,7 @@ Each Winche package works without this one: without `AddWincheConfig`, its areas
 builder.Services.AddWincheConfig(o =>
 {
     o.ConnectionString = connectionString;
-    o.MasterKey = builder.Configuration["Winche:MasterKey"];   // 32+ characters; needed only for secrets
+    o.MasterKey = builder.Configuration["Winche:MasterKey"];   // 32+ characters: signing keys, and Winche.Secrets
 });
 
 // Packages register their areas (e.g. Winche.Auth's AddWincheTokens(t => t.UseSettings())); your own code can too:
@@ -79,8 +79,7 @@ var area = builder.Services.AddWincheSettingsArea("app.banner", "Banner", new Ba
 | `ResetAsync(area, …)` | back to the code's values (a version of its own, so it can be undone) |
 | `RestoreAsync(id, …)` | an earlier version again, as a new version |
 | `HistoryAsync(area?)` | every change, newest first |
-| `SecretStore.SetAsync / GetAsync / InfoAsync / DeleteAsync` | encrypted secrets (AES-256-GCM, bound to their name) |
 
-Tables: `winche_settings`, `winche_secrets` (made on start, with `WincheSchema`: each package's tables are made and
+Table: `winche_settings` (made on start, with `WincheSchema`: each package's tables are made and
 upgraded in numbered steps under a lock, so many servers starting at once don't race). Other instances look for changes every `PollInterval`
 (5 seconds). A saved version the app can no longer read (its shape changed) is logged and skipped.

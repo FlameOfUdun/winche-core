@@ -9,10 +9,13 @@ namespace Winche.Core;
 /// <summary>Where the settings live, and how often other instances' changes are picked up.</summary>
 public sealed class WincheConfigOptions
 {
-    /// <summary>The project's PostgreSQL database (tables <c>winche_settings</c>, <c>winche_secrets</c>).</summary>
+    /// <summary>The project's PostgreSQL database (table <c>winche_settings</c>; Winche.Secrets keeps its secrets here too).</summary>
     public string ConnectionString { get; set; } = "";
 
-    /// <summary>The key that encrypts secrets (32+ characters, from configuration or a key service). Without it, secrets can't be saved.</summary>
+    /// <summary>
+    /// The master key (32+ characters, from configuration or a key service): signing keys are derived from it
+    /// (<see cref="WincheKeys"/>), and Winche.Secrets encrypts secrets with it.
+    /// </summary>
     public string? MasterKey { get; set; }
 
     /// <summary>
@@ -45,7 +48,6 @@ public static class ServiceCollectionExtensions
             sp.GetRequiredKeyedService<NpgsqlDataSource>(nameof(WincheConfigOptions)),
             sp.GetServices<SettingsArea>(), sp.GetRequiredService<ILogger<SettingsStore>>()));
         services.AddSingleton(new WincheKeys(options.MasterKey, options.PreviousMasterKeys));
-        services.AddSingleton(sp => new SecretStore(sp.GetRequiredKeyedService<NpgsqlDataSource>(nameof(WincheConfigOptions)), options.MasterKey, options.PreviousMasterKeys));
         services.AddHostedService<SettingsWatcher>();
         return services;
     }
@@ -68,18 +70,11 @@ public static class ServiceCollectionExtensions
 }
 
 /// <summary>Makes the tables and loads the settings on start, then picks up other instances' changes.</summary>
-internal sealed class SettingsWatcher(SettingsStore store, SecretStore secrets, WincheConfigOptions options, ILogger<SettingsWatcher> logger) : BackgroundService
+internal sealed class SettingsWatcher(SettingsStore store, WincheConfigOptions options, ILogger<SettingsWatcher> logger) : BackgroundService
 {
     public override async Task StartAsync(CancellationToken ct)
     {
         await store.InitializeAsync(ct);
-        // A changed master key: secrets still under a previous one move to the current one.
-        if (options.PreviousMasterKeys.Count > 0)
-        {
-            var moved = await secrets.ReencryptAsync(ct);
-            if (moved.Reencrypted > 0) logger.LogInformation("Re-encrypted {Count} secrets with the current master key.", moved.Reencrypted);
-            if (moved.Unreadable > 0) logger.LogError("{Count} secrets can't be read with the current or any previous master key.", moved.Unreadable);
-        }
         await base.StartAsync(ct);
     }
 

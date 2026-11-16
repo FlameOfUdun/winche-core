@@ -135,7 +135,7 @@ public sealed class SettingsStore
 
     internal Task InitializeAsync(CancellationToken ct) => EnsureLoadedAsync(ct);
 
-    /// <summary>The settings and secrets tables, in the order they were introduced (<see cref="WincheSchema"/>).</summary>
+    /// <summary>The settings table, in the order its changes were introduced (<see cref="WincheSchema"/>). (Secrets: Winche.Secrets.)</summary>
     internal static readonly string[] Steps =
     [
         """
@@ -149,12 +149,6 @@ public sealed class SettingsStore
               reason text NULL,
               restored_from bigint NULL,
               UNIQUE (area, number)
-            );
-            CREATE TABLE IF NOT EXISTS winche_secrets (
-              name text PRIMARY KEY,
-              ciphertext bytea NOT NULL,
-              set_at timestamptz NOT NULL,
-              set_by text NULL
             );
         """,
     ];
