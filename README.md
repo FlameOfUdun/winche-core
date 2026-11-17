@@ -85,3 +85,10 @@ Table: `winche_settings` (made on start, with `WincheSchema`: each package's tab
 upgraded in numbered steps under a lock, so many servers starting at once don't race). Other instances look for changes every `PollInterval`
 (5 seconds). A saved version the app can no longer read (its shape changed) is logged and skipped.
 
+## Upgrading to 2.0
+
+**Breaking:** the secret store (`SecretStore`) is no longer here: it's [Winche.Secrets](https://github.com/FlameOfUdun/winche-secrets), a package of its own (namespace
+`Winche.Secrets`), with the same table and encryption, so saved secrets read as before. Winche.Auth 2, Winche.Storage 11,
+Winche.Webhooks 2, Winche.Assets and Winche.Functions 2 depend on it and add it themselves; code that used
+`SecretStore` directly adds the package and `using Winche.Secrets;`. A secret can now also be a reference to AWS
+Secrets Manager or Parameter Store (Winche.Secrets.Aws).
