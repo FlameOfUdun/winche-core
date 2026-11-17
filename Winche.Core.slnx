@@ -2,12 +2,8 @@
   <Folder Name="/src/">
     <Project Path="src/Winche.Core/Winche.Core.csproj" />
     <Project Path="src/Winche.Core.AspNetCore/Winche.Core.AspNetCore.csproj" />
-    <Project Path="src/Winche.Secrets/Winche.Secrets.csproj" />
-    <Project Path="src/Winche.Secrets.Aws/Winche.Secrets.Aws.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Winche.Core.Tests/Winche.Core.Tests.csproj" />
-    <Project Path="tests/Winche.Secrets.Tests/Winche.Secrets.Tests.csproj" />
-    <Project Path="tests/Winche.Secrets.Aws.Tests/Winche.Secrets.Aws.Tests.csproj" />
   </Folder>
 </Solution>

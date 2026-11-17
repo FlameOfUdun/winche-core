@@ -1,8 +1,9 @@
 name: Publish
 
 # Push a tag v<version> (the <Version> in the projects, e.g. v1.2.0) to publish every package here to nuget.org:
-# Winche.Core, Winche.Core.AspNetCore, Winche.Secrets and Winche.Secrets.Aws.
-# Winche packages depend on each other through nuget.org, so release in order: Winche.Core (with Winche.Secrets), Winche.Rules, then
+# Winche.Core and Winche.Core.AspNetCore.
+# Winche packages depend on each other through nuget.org, so release in order: Winche.Core, Winche.Secrets,
+# Winche.Rules, then
 # Winche.Database, Winche.Storage, Winche.Auth and Winche.Webhooks, then Winche.Assets, then Winche.Functions, then
 # Winche.Cli.
 
@@ -49,8 +50,6 @@ jobs:
         run: |
           dotnet pack src/Winche.Core/Winche.Core.csproj -c Release --no-build -o ./packages
           dotnet pack src/Winche.Core.AspNetCore/Winche.Core.AspNetCore.csproj -c Release --no-build -o ./packages
-          dotnet pack src/Winche.Secrets/Winche.Secrets.csproj -c Release --no-build -o ./packages
-          dotnet pack src/Winche.Secrets.Aws/Winche.Secrets.Aws.csproj -c Release --no-build -o ./packages
 
       # Exchange the GitHub OIDC token for a short-lived NuGet.org API key.
       - name: NuGet login (trusted publishing)
