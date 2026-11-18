@@ -4,7 +4,7 @@ namespace Winche.Core.Tests;
 
 public class WincheAppSetupTests
 {
-    private static readonly WincheAppSetup Setup = new("clinic", "Clinic", "https://api.example.com/p/clinic",
+    private static readonly WincheAppSetup Setup = new("clinic", "Clinic", "https://api.example.com/projects/clinic",
         [new("database", "/documents/v1", "/documents/v1/ws"), new("auth", "/auth/v1")],
         [new("google", "google", "Google", ["g.apps.googleusercontent.com"]), new("apple", "apple", "Apple", ["a", "b"])],
         new("clinic-ios", "Clinic iOS"));
@@ -18,7 +18,7 @@ public class WincheAppSetupTests
         Assert.DoesNotContain("static final web", dart);
         Assert.Contains("projectId: 'clinic',", dart);
         Assert.Contains("appId: 'clinic-ios',   // Clinic iOS", dart);
-        Assert.Contains("baseUrl: Uri.parse('https://api.example.com/p/clinic'),", dart);
+        Assert.Contains("baseUrl: Uri.parse('https://api.example.com/projects/clinic'),", dart);
         Assert.Contains("'google': 'g.apps.googleusercontent.com',", dart);
         Assert.Contains("// apple: one of a, b", dart);
         // Without an app, it says how to get one; with no platforms named, all of them.
